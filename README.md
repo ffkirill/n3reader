@@ -8,6 +8,6 @@ communication protocol specification
 
 usage: $n3reader --port=&lt;port_name&gt; &lt;command&gt;
 
-Currently two, commands are supported:<br/>
+Currently, two commands are supported:<br/>
   -get_device_info - Read device model, s/n, s/w and h/w versions<br/>
   -read_jumps_summary - Reads jumps summary data
