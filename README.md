@@ -1,6 +1,6 @@
 n3reader
 ========
-2013-10-12.
+2013-10-12.<br/>
 Started to work on Alti2 Neptune 3 protocol implementation.
 Coded from Alexey Lobanov reverse engineered Altimaster N-series
 communication protocol specification
