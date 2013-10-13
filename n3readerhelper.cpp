@@ -1,6 +1,7 @@
 #include "n3readerhelper.h"
-#include "n3readerbasecommand.h"
+#include "commands/n3readerbasecommand.h"
 #include <QSerialPort>
+#include <QDataStream>
 
 N3ReaderHelper::N3ReaderHelper(QObject *parent) :
     QObject(parent)
@@ -20,16 +21,24 @@ uint32_t N3ReaderHelper::bytesToUInt(const uchar &byte0,
                      const uchar &byte2,
                      const uchar &byte3)
 {
-    return byte0 + (byte1 << 8) + (byte2 << 16) + (byte3 << 24);
+    QByteArray data(4,0);
+    data[0] = byte0;
+    data[1] = byte1;
+    data[2] = byte2;
+    data[3] = byte3;
+    QDataStream st(data);
+    st.setByteOrder(QDataStream::LittleEndian);
+    quint32 res;
+    st >> res;
+    return res;
 }
 
 QByteArray N3ReaderHelper::UIntToBytes(const uint32_t &dword)
 {
     QByteArray result;
-    result.append((uchar) (dword));
-    result.append((uchar) (dword>>8));
-    result.append((uchar) (dword>>16));
-    result.append((uchar) (dword>>24));
+    QDataStream st(&result, QIODevice::ReadWrite);
+    st.setByteOrder(QDataStream::LittleEndian);
+    st << dword;
     return result;
 }
 
