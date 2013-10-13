@@ -5,8 +5,8 @@
 #include <QSharedPointer>
 #include "n3readerhelper.h"
 #include "n3readerresultconsoleview.h"
-#include "n3gettype0command.h"
-#include "n3readjumpssummarycommand.h"
+#include "commands/n3gettype0command.h"
+#include "commands/n3readjumpssummarycommand.h"
 #include <QDebug>
 #include <iostream>
 #include <QRegExp>
