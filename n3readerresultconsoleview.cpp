@@ -1,5 +1,5 @@
 #include "n3readerresultconsoleview.h"
-#include "n3readerbaseresult.h"
+#include "commands/n3readerbaseresult.h"
 #include <iostream>
 #include <QSharedPointer>
 

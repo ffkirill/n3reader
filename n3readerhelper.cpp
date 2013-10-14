@@ -33,7 +33,7 @@ uint32_t N3ReaderHelper::bytesToUInt(const uchar &byte0,
     return res;
 }
 
-QByteArray N3ReaderHelper::UIntToBytes(const uint32_t &dword)
+QByteArray N3ReaderHelper::UIntToBytes(const quint32 &dword)
 {
     QByteArray result;
     QDataStream st(&result, QIODevice::ReadWrite);
