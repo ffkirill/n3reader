@@ -4,30 +4,15 @@
 #
 #-------------------------------------------------
 
-QT       += core
 
-QT       -= gui
-
-TARGET = commands
-TEMPLATE = lib
-CONFIG += staticlib
-
-
-HEADERS += n3commands.h \
+HEADERS += \
     commands/n3readjumpssummarycommandresult.h \
     commands/n3readjumpssummarycommand.h \
     commands/n3readerbaseresult.h \
     commands/n3readerbasecommand.h \
     commands/n3gettype0commandresult.h \
-    commands/n3gettype0command.h
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+    commands/n3gettype0command.h \
+    commands/n3readmemoryblockcommand.h
 
 SOURCES += \
     commands/n3readjumpssummarycommandresult.cpp \
@@ -35,4 +20,5 @@ SOURCES += \
     commands/n3readerbaseresult.cpp \
     commands/n3readerbasecommand.cpp \
     commands/n3gettype0commandresult.cpp \
-    commands/n3gettype0command.cpp
+    commands/n3gettype0command.cpp \
+    commands/n3readmemoryblockcommand.cpp

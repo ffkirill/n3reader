@@ -33,47 +33,47 @@ QString N3ReadJumpsSummaryCommandResult::toString() const
 
 quint16 N3ReadJumpsSummaryCommandResult::getTotalJumpsSinceOdometerReset() const
 {
-    return getInt16(3);
+    return getInt16(2);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getTotalJumpsStoredIncDeleted() const
 {
-    return getInt16(5);
+    return getInt16(4);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getTotalJumpsStored() const
 {
-    return getInt16(7);
+    return getInt16(6);
 }
 
 quint32 N3ReadJumpsSummaryCommandResult::getFreefallTime() const
 {
-    return getInt32(9);
+    return getInt32(8);
 }
 
 quint32 N3ReadJumpsSummaryCommandResult::getCanopyPilotingTime() const
 {
-    return getInt32(13);
+    return getInt32(12);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getNextJumpNumber() const
 {
-    return getInt16(17);
+    return getInt16(16);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getTopJumpNumber() const
 {
-    return getInt16(19);
+    return getInt16(18);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getCurrentDZIdx() const
 {
-    return getInt16(25);
+    return getInt16(24);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getCurrentACIdx() const
 {
-    return getInt16(27);
+    return getInt16(26);
 }
 
 quint16 N3ReadJumpsSummaryCommandResult::getInt16(int pos) const

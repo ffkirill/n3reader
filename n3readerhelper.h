@@ -19,7 +19,7 @@ public:
                                 const uchar &byte1,
                                 const uchar &byte2,
                                 const uchar &byte3);
-    static QByteArray UIntToBytes(const uint32_t &dword);
+    static QByteArray UIntToBytes(const quint32 &dword);
     static uchar calculateChecksum(const QByteArray &packet);
     void encrypt(uint32_t &U, uint32_t &U1) const;
     void decrypt(uint32_t &U, uint32_t &U1) const;
