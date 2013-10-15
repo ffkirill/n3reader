@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 
 N3ReadJumpsSummaryCommand::N3ReadJumpsSummaryCommand(QObject *parent) :
-    N3ReadMemoryBlockCommand(0x0A, 0x1E, parent)
+    N3ReadMemoryBlockCommand(0x0A, 0x1E, 30, parent)
 {
 }
 

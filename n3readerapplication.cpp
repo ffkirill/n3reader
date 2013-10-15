@@ -7,6 +7,7 @@
 #include "n3readerresultconsoleview.h"
 #include "commands/n3gettype0command.h"
 #include "commands/n3readjumpssummarycommand.h"
+#include "commands/n3readjumpsdetailscommand.h"
 #include <QDebug>
 #include <iostream>
 #include <QRegExp>
@@ -23,6 +24,7 @@ N3ReaderApplication::N3ReaderApplication(int &argc, char **argv) :
     //Register commands
     registerCommand(new N3GetType0Command(m_reader));
     registerCommand(new N3ReadJumpsSummaryCommand(m_reader));
+    registerCommand(new N3ReadJumpsDetailsCommand(m_reader));
 
     //Set up in and out data handlers
     QObject::connect(m_reader,&N3ReaderHelper::dataToSend, [this](const QByteArray &data){
