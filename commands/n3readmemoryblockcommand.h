@@ -9,12 +9,13 @@ class N3ReadMemoryBlockCommand : public N3ReaderBaseCommand
 public:
     explicit N3ReadMemoryBlockCommand(quint32 address,
                                       qint16 length,
+                                      qint16 resultLength,
                                       QObject *parent);
     virtual void execute();
     virtual void processPacket(const QByteArray &data);
 protected:
     QByteArray rawData;
-    const qint16 resultPresentationQuantum=0;
+    const qint16 resultPresentationQuantum;
 private:
     enum class CommandState {
         initial,

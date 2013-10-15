@@ -7,9 +7,11 @@
 const QByteArray N3ReadMemoryBlockCommand::acknowledgementString = QByteArray::fromHex("31 35");
 
 N3ReadMemoryBlockCommand::N3ReadMemoryBlockCommand(quint32 address,
-                                                    qint16 length,
+                                                   qint16 length,
+                                                   qint16 resultLength,
                                                     QObject *parent = 0) :
     N3ReaderBaseCommand(parent),
+    resultPresentationQuantum(resultLength),
     memoryBlockAddress(address),
     memoryBlockLength(length),
     outDataSendTimer(new QTimer(this))
@@ -82,25 +84,43 @@ void N3ReadMemoryBlockCommand::processPacket(const QByteArray &data)
         }
     }
 
-    //accumulate data in buffer after acknowledgement received
+    //process data after acknowledgement received
     if (m_state==CommandState::receivingData) {
         appendBufferOnFirstCall(inBuffer, data, appendInBuffer);
         if (inBuffer.size()>=memoryBlockReadQuantum) {
+
             emit sendPacket(QByteArray::fromHex("31"));
+
             QByteArray dataReceived = reader()->decryptPacket(inBuffer);
-            if (rawData.size()) {
-                rawData.append(dataReceived);
-            } else {
-                rawData.append(dataReceived.mid(4));
+            inBuffer.clear();
+
+            if (!bytesReceived) {
+                dataReceived = dataReceived.mid(4);
             }
-            bytesReceived +=rawData.size();
+
+            if (bytesReceived + dataReceived.size() > memoryBlockLength) {
+                rawData.append(dataReceived.left(memoryBlockLength-bytesReceived));
+                bytesReceived = memoryBlockLength;
+            } else {
+                bytesReceived += dataReceived.size();
+                rawData.append(dataReceived);
+            }
+
             if (bytesReceived >= memoryBlockLength
-                    || rawData.size() >=resultPresentationQuantum) {
-                rawDataReady();
-                if (rawData.size() >= memoryBlockLength) {
+                    || rawData.size() >= resultPresentationQuantum) {
+
+                while (rawData.size() >= resultPresentationQuantum) {
+                    rawDataReady();
+                    if (rawData.size() > resultPresentationQuantum) {
+                        rawData = rawData.mid(resultPresentationQuantum);
+                    } else {
+                        rawData.clear();
+                    }
+                }
+
+                if (bytesReceived >= memoryBlockLength) {
                     emit commandFinished();
                 }
-                rawData=rawData.mid(resultPresentationQuantum);
             }
         }
     }
