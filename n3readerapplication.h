@@ -31,6 +31,7 @@ private:
     void openPort(N3ReaderBaseCommand *initialCommand);
     void setCommandFinishedHandlers();
     bool parseCommandLine();
+    bool usage();
 signals:
     
 public slots:

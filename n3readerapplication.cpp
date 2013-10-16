@@ -45,12 +45,12 @@ N3ReaderApplication::N3ReaderApplication(int &argc, char **argv) :
 
 void N3ReaderApplication::openPort(N3ReaderBaseCommand *initialCommand)
 {
-    std::cout << "Opening port" << std::endl;
+    std::cerr << "Opening port" << std::endl;
     m_ioDevice->setPortName(m_portName);
 
     if (!m_ioDevice->open(QIODevice::ReadWrite)){
-        std::cout << "Error:";
-        std::cout << m_ioDevice->errorString().toLocal8Bit().data();
+        std::cerr << "Error:";
+        std::cerr << m_ioDevice->errorString().toLocal8Bit().data();
         quit();
         return;
     }
@@ -63,7 +63,7 @@ void N3ReaderApplication::openPort(N3ReaderBaseCommand *initialCommand)
     m_ioDevice->setReadBufferSize(0);
 
     m_ioDevice->setDataTerminalReady(true);
-    std::cout << "Waiting 10 sec.." << std::endl;
+    std::cerr << "Waiting 10 sec.." << std::endl;
 
 
     m_timer->setSingleShot(true);
@@ -71,20 +71,13 @@ void N3ReaderApplication::openPort(N3ReaderBaseCommand *initialCommand)
 
     connect(m_timer, &QTimer::timeout, [this, initialCommand](){
 
-        std::cout << "Working.." << std::endl;
+        std::cerr << "Working.." << std::endl;
 
         m_reader->executeCommand(initialCommand);
 
     });
 
     m_timer->start(10000);
-}
-
-bool usage()
-{
-    std::cout << "Usage:";
-    std::cout << "n3reader --port=<port_name> <command>" << std:: endl;
-    return false;
 }
 
 inline QStringList serialPortNames()
@@ -97,30 +90,46 @@ inline QStringList serialPortNames()
     return result;
 }
 
+inline void displayPortNames(const QStringList &ports)
+{
+    for (const QString &name:ports){
+        std::cout <<name.toLocal8Bit().data() << " ";
+    }
+    std::cout << std::endl;
+}
+
+inline void displayCommandNames(const QMap<QString, N3ReaderBaseCommand*> &m_commands)
+{
+    for (auto key:m_commands.keys()) {
+        std::cout << key.toLocal8Bit().data();
+        std::cout << " - " << m_commands.value(key)->description()
+                     .toLocal8Bit().data() << std::endl;
+    }
+}
+
+
+bool N3ReaderApplication::usage()
+{
+    std::cout << "Usage:" <<std::endl;
+    std::cout << "n3reader --port=<port_name> <command>" << std:: endl;
+    std::cout << "Commands:" <<std::endl;
+    displayCommandNames(m_commands);
+    std::cout << "Port names:" <<std::endl;
+    displayPortNames(serialPortNames());
+    return false;
+}
+
 inline bool checkPortName(const QString &portName)
 {
     QStringList ports = serialPortNames();
     if (ports.indexOf(portName)==-1) {
         std::cout << "Invalid port name. ";
         std::cout << "Port names are:" << std::endl <<" ";
-        for (const QString &name:ports){
-            std::cout <<name.toLocal8Bit().data() << " ";
-        }
-        std::cout << std::endl;
+        displayPortNames(ports);
         return false;
     }
 
     return true;
-}
-
-inline void displayCommandNames(const QMap<QString, N3ReaderBaseCommand*> &m_commands)
-{
-    std::cout << "Invalid command. Commands are:" <<std::endl;
-    for (auto key:m_commands.keys()) {
-        std::cout << key.toLocal8Bit().data();
-        std::cout << " - " << m_commands.value(key)->description()
-                     .toLocal8Bit().data() << std::endl;
-    }
 }
 
 bool N3ReaderApplication::parseCommandLine()
@@ -147,6 +156,7 @@ bool N3ReaderApplication::parseCommandLine()
     cmdRx.indexIn(args[cmdIdx]);
     m_commandName = cmdRx.capturedTexts()[1];
     if (!m_commands.contains(m_commandName)) {
+        std::cout << "Invalid command. Commands are:" <<std::endl;
         displayCommandNames(m_commands);
         return false;
     }
@@ -179,7 +189,7 @@ void N3ReaderApplication::runTask()
     //start command on initial command finished
     connect(m_reader, &N3ReaderHelper::stateChanged, [this](const N3ReaderHelper::ReaderState & state){
         if (state == N3ReaderHelper::ReaderState::ready){
-            std::cout << "Device ready" << std::endl;
+            std::cerr << "Device ready" << std::endl;
             setCommandFinishedHandlers();
             m_reader->executeCommand(m_command);
         }

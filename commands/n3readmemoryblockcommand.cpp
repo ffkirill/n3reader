@@ -126,6 +126,30 @@ void N3ReadMemoryBlockCommand::processPacket(const QByteArray &data)
     }
 }
 
+void N3ReadMemoryBlockCommand::rawDataReady()
+{
+    emit rawDataAvailable(rawData);
+}
+
+void N3ReadMemoryBlockCommand::setMemoryBlockAddress(const quint32 &address)
+{
+    memoryBlockAddress = address;
+}
+
+void N3ReadMemoryBlockCommand::setMemoryBlockLength(const quint32 &length)
+{
+    memoryBlockLength = length;
+}
+
+quint32 N3ReadMemoryBlockCommand::getMemoryBlockAddress() const
+{
+    return memoryBlockAddress;
+}
+
+quint32 N3ReadMemoryBlockCommand::getMemoryBlockLength() const
+{
+    return memoryBlockLength;
+}
 
 void N3ReadMemoryBlockCommand::onOutDataSendTimerShot()
 {
@@ -137,4 +161,16 @@ void N3ReadMemoryBlockCommand::onOutDataSendTimerShot()
         outBufferPosition=0;
         outBuffer.clear();
     }
+}
+
+const QString &N3ReadMemoryBlockCommand::commandName() const
+{
+    static const QString name("read_memory_block");
+    return name;
+}
+
+const QString &N3ReadMemoryBlockCommand::description() const
+{
+    static const QString name("Reads memory block (internal use)");
+    return name;
 }

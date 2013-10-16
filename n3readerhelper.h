@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QQueue>
+
 class N3ReaderBaseCommand;
 
 class N3ReaderHelper : public QObject
@@ -29,12 +31,14 @@ public:
     void setKey(const uint32_t key[]);
 private:
     const size_t N3_ENCODED_PACKET_SIZE = 32;
-    N3ReaderBaseCommand *m_command;
+    N3ReaderBaseCommand *m_command=0;
     uint32_t m_key[4];
     ReaderState m_state=ReaderState::closed;
+    QQueue<N3ReaderBaseCommand *> m_commands;
     void setDeviceState(const ReaderState &state);
 private slots:
     void commandFinished();
+    void dequeueNextCommand();
     void sendData(const QByteArray &data);
 signals:
     void dataToSend(const QByteArray &data);

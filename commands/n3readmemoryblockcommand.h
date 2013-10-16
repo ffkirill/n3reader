@@ -13,9 +13,15 @@ public:
                                       QObject *parent);
     virtual void execute();
     virtual void processPacket(const QByteArray &data);
+    virtual const QString &commandName() const;
+    virtual const QString &description() const;
 protected:
     QByteArray rawData;
     const qint16 resultPresentationQuantum;
+    void setMemoryBlockAddress(const quint32 &address);
+    void setMemoryBlockLength(const quint32 &length);
+    quint32 getMemoryBlockAddress() const;
+    quint32 getMemoryBlockLength() const;
 private:
     enum class CommandState {
         initial,
@@ -27,19 +33,19 @@ private:
     CommandState m_state = CommandState::initial;
     quint16 bytesReceived=0;
     static const int msByteSendingDelay=10;
-    const qint32 memoryBlockAddress;
-    const qint16 memoryBlockLength;
+    qint32 memoryBlockAddress;
+    qint16 memoryBlockLength;
     const qint16 memoryBlockReadQuantum=32;
     static const QByteArray acknowledgementString;
     QByteArray outBuffer;
     QByteArray inBuffer;
     QTimer *outDataSendTimer;
     int outBufferPosition=0;
-    virtual void rawDataReady()=0;
+    virtual void rawDataReady();
 private slots:
     void onOutDataSendTimerShot();
 signals:
-
+    void rawDataAvailable(QByteArray data);
 public slots:
 
 };

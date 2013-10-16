@@ -13,7 +13,8 @@ HEADERS += \
     commands/n3gettype0commandresult.h \
     commands/n3gettype0command.h \
     commands/n3readmemoryblockcommand.h \
-    commands/n3readjumpsdetailscommand.h
+    commands/n3readjumpsdetailscommand.h \
+    commands/n3readjumpsdetailscommandresult.h
 
 SOURCES += \
     commands/n3readjumpssummarycommandresult.cpp \
@@ -23,4 +24,5 @@ SOURCES += \
     commands/n3gettype0commandresult.cpp \
     commands/n3gettype0command.cpp \
     commands/n3readmemoryblockcommand.cpp \
-    commands/n3readjumpsdetailscommand.cpp
+    commands/n3readjumpsdetailscommand.cpp \
+    commands/n3readjumpsdetailscommandresult.cpp
