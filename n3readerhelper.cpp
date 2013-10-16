@@ -163,11 +163,11 @@ QByteArray N3ReaderHelper::decryptPacket(const QByteArray &packet) const
 
 void N3ReaderHelper::executeCommand(N3ReaderBaseCommand *command)
 {
-    m_command = command;
+    m_commands.append(command->requrements());
+    m_commands.append(command);
     setDeviceState(N3ReaderHelper::ReaderState::processing);
-    connect(m_command, SIGNAL(sendPacket(QByteArray)), this, SLOT(sendData(QByteArray)));
-    connect(m_command, SIGNAL(commandFinished()), this, SLOT(commandFinished()));
-    m_command->execute();
+    dequeueNextCommand();
+
 }
 
 void N3ReaderHelper::setKey(const uint32_t key[])
@@ -189,6 +189,26 @@ void N3ReaderHelper::commandFinished()
     disconnect(m_command, 0, this, 0);
     m_command = 0;
     setDeviceState(N3ReaderHelper::ReaderState::ready);
+}
+
+void N3ReaderHelper::dequeueNextCommand()
+{
+    if (m_command) {
+        disconnect(m_command, 0, this, 0);
+    }
+
+    if (m_commands.count()) {
+        m_command = m_commands.dequeue();
+
+        connect(m_command, SIGNAL(sendPacket(QByteArray)), this, SLOT(sendData(QByteArray)));
+        if (m_commands.count()) {
+            connect(m_command,  SIGNAL(commandFinished()), this, SLOT(dequeueNextCommand()));
+        } else {
+            connect(m_command, SIGNAL(commandFinished()), this, SLOT(commandFinished()));
+        }
+
+        m_command->execute();
+    }
 }
 
 void N3ReaderHelper::sendData(const QByteArray &data)

@@ -14,7 +14,8 @@ public:
     virtual void execute()=0;
     virtual void processPacket(const QByteArray &data)=0;
     virtual const QString &commandName() const = 0;
-    virtual const QString &description() const = 0 ;
+    virtual const QString &description() const = 0;
+    virtual QList<N3ReaderBaseCommand *> requrements();
 signals:
     void sendPacket(const QByteArray &data);
     void commandFinished();
