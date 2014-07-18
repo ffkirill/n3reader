@@ -13,6 +13,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include <QString>
+#include <QCommandLineParser>
 
 N3ReaderApplication::N3ReaderApplication(int &argc, char **argv) :
     QCoreApplication(argc, argv),
@@ -21,6 +22,10 @@ N3ReaderApplication::N3ReaderApplication(int &argc, char **argv) :
     m_view(new N3ReaderResultConsoleView(this)),
     m_timer(new QTimer(this))
 {
+    //Common app settings
+    QCoreApplication::setApplicationName("N3Reader");
+    QCoreApplication::setApplicationVersion("0.0.1b");
+
     //Register commands
     registerCommand(new N3GetType0Command(m_reader));
     registerCommand(new N3ReadJumpsSummaryCommand(m_reader));
@@ -90,86 +95,63 @@ inline QStringList serialPortNames()
     return result;
 }
 
-inline void displayPortNames(const QStringList &ports)
+QStringList N3ReaderApplication::getCommandNames()
 {
-    for (const QString &name:ports){
-        std::cout <<name.toLocal8Bit().data() << " ";
-    }
-    std::cout << std::endl;
-}
-
-inline void displayCommandNames(const QMap<QString, N3ReaderBaseCommand*> &m_commands)
-{
+    QStringList result;
     for (auto key:m_commands.keys()) {
-        std::cout << key.toLocal8Bit().data();
-        std::cout << " - " << m_commands.value(key)->description()
-                     .toLocal8Bit().data() << std::endl;
+        result.append(
+            QString("%1 - %2").arg(key).arg(m_commands.value(key)->description())
+        );
     }
-}
 
-
-bool N3ReaderApplication::usage()
-{
-    std::cout << "Usage:" <<std::endl;
-    std::cout << "n3reader --port=<port_name> <command>" << std:: endl;
-    std::cout << "Commands:" <<std::endl;
-    displayCommandNames(m_commands);
-    std::cout << "Port names:" <<std::endl;
-    displayPortNames(serialPortNames());
-    return false;
+    return result;
 }
 
 inline bool checkPortName(const QString &portName)
 {
-    QStringList ports = serialPortNames();
-    if (ports.indexOf(portName)==-1) {
-        std::cout << "Invalid port name. ";
-        std::cout << "Port names are:" << std::endl <<" ";
-        displayPortNames(ports);
-        return false;
-    }
-
-    return true;
+    return serialPortNames().contains(portName);
 }
 
-bool N3ReaderApplication::parseCommandLine()
+void N3ReaderApplication::parseCommandLine()
 {
-    QStringList args = arguments();
-    QRegExp portRx("--port=(\\S+)");
-    QRegExp cmdRx("(\\w+)");
-    int portParamIdx=-1;
-    if (args.length()<3 || (portParamIdx=args.indexOf(portRx))==-1) {
-        return usage();
+    QCommandLineParser parser;
+    parser.setApplicationDescription("N3Reader");
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument(
+        "command",
+        QString("Command, one of:\n%1").arg(this->getCommandNames().join("\n"))
+    );
+
+    QCommandLineOption portNameOption(
+        QStringList() << "p" << "port",
+        QString("Port name [%1]").arg(serialPortNames().join(", ")),
+        "port"
+    );
+
+    parser.addOption(portNameOption);
+    parser.process(*this);
+
+    //Check if arguments correct
+    if (parser.positionalArguments().size() != 1) {
+        parser.showHelp(1);
     }
-    portRx.indexIn(args[portParamIdx]);
-    m_portName = portRx.capturedTexts()[1];
+    m_portName = parser.value(portNameOption);
 
-    if (!checkPortName(m_portName))
-        return false;
-
-    int cmdIdx = args.indexOf(cmdRx);
-
-    if (cmdIdx == -1) {
-        return usage();
+    if (!checkPortName(m_portName)) {
+        parser.showHelp(1);
     }
 
-    cmdRx.indexIn(args[cmdIdx]);
-    m_commandName = cmdRx.capturedTexts()[1];
+    m_commandName = parser.positionalArguments().at(0);
     if (!m_commands.contains(m_commandName)) {
-        std::cout << "Invalid command. Commands are:" <<std::endl;
-        displayCommandNames(m_commands);
-        return false;
+        parser.showHelp(1);
     }
-    return true;
 }
 
 void N3ReaderApplication::runTask()
 {
     //check command line params
-    if (!parseCommandLine()) {
-        quit();
-        return;
-    }
+    parseCommandLine();
 
     N3ReaderBaseCommand * initialCommand = new N3GetType0Command(m_reader);
     m_command = m_commands[m_commandName];

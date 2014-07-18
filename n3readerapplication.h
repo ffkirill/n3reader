@@ -10,7 +10,7 @@ class N3ReaderHelper;
 class N3ReaderResultConsoleView;
 class N3ReaderBaseCommand;
 class QTimer;
-
+class QCommandLineParser;
 
 class N3ReaderApplication : public QCoreApplication
 {
@@ -18,6 +18,7 @@ class N3ReaderApplication : public QCoreApplication
 public:
     void registerCommand(N3ReaderBaseCommand *command,
                          char *cmdline_name=0);
+    QStringList getCommandNames();
     explicit N3ReaderApplication(int &argc, char **argv);
 private:
     QSerialPort *m_ioDevice;
@@ -30,8 +31,7 @@ private:
     QMap<QString, N3ReaderBaseCommand*> m_commands;
     void openPort(N3ReaderBaseCommand *initialCommand);
     void setCommandFinishedHandlers();
-    bool parseCommandLine();
-    bool usage();
+    void parseCommandLine();
 signals:
     
 public slots:
